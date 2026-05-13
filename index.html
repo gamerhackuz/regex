@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Tester</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0b0f19; color: #e2e8f0; min-height: 100vh; padding: 20px; display: flex; justify-content: center; }
+        .card { background: #151b2b; padding: 25px; border-radius: 12px; border: 1px solid #2d3748; width: 100%; max-width: 600px; }
+        h2 { color: #60a5fa; margin-bottom: 15px; text-align: center; }
+        input, textarea { width: 100%; padding: 10px; background: #0d1321; border: 1px solid #334155; color: white; border-radius: 6px; margin-bottom: 12px; font-family: monospace; }
+        input:focus, textarea:focus { outline: none; border-color: #60a5fa; }
+        .output { background: #0d1321; padding: 12px; border-radius: 6px; min-height: 80px; font-family: monospace; white-space: pre-wrap; line-height: 1.6; }
+        mark { background: #2563eb; color: white; padding: 2px 4px; border-radius: 3px; }
+        .error { color: #ef4444; margin-bottom: 10px; display: none; }
+        .info { display: flex; gap: 15px; margin-bottom: 15px; font-size: 14px; color: #94a3b8; }
+        .cheat { background: #1e293b; padding: 10px; border-radius: 8px; font-size: 12px; color: #94a3b8; margin-top: 15px; }
+        .cheat span { color: #60a5fa; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🔍 Regex Tester</h2>
+        <div class="error" id="err">⚠️ Noto'g'ri Regex!</div>
+        <input type="text" id="pattern" placeholder="/pattern/g" value="/\b\w+@\w+\.\w+\b/g">
+        <textarea id="text" rows="3" placeholder="Sinov matni...">Salom, emailim user@example.com, yoki admin@site.org ga yozing.</textarea>
+        <div class="info"><span>🔍 Mosliklar: <b id="count">0</b></span><span>📍 Joy: <span id="pos">-</span></span></div>
+        <div class="output" id="output"></div>
+        <div class="cheat">
+            <strong>Cheatsheet:</strong> <span>\w</span> harf/raqam, <span>\d</span> raqam, <span>\s</span> bo'shliq, <span>^</span> boshlanish, <span>$</span> tugash, <span>*</span> 0 yoki ko'p, <span>+</span> 1 yoki ko'p, <span>?</span> 0 yoki 1, <span>[abc]</span> tanlov, <span>(a|b)</span> yoki.
+        </div>
+    </div>
+
+    <script>
+        const patternEl = document.getElementById('pattern');
+        const textEl = document.getElementById('text');
+        const output = document.getElementById('output');
+        const err = document.getElementById('err');
+        const countEl = document.getElementById('count');
+        const posEl = document.getElementById('pos');
+
+        function testRegex() {
+            const p = patternEl.value.trim();
+            const t = textEl.value;
+            err.style.display = 'none';
+            
+            if (!p || !t) { output.textContent = t; return; }
+            
+            try {
+                const regex = new RegExp(p);
+                const matches = [...t.matchAll(regex)];
+                countEl.textContent = matches.length;
+                posEl.textContent = matches.length ? matches.map(m => m.index).join(', ') : '-';
+                
+                let html = t;
+                matches.reverse().forEach(m => {
+                    html = html.slice(0, m.index) + `<mark>${m[0]}</mark>` + html.slice(m.index + m[0].length);
+                });
+                output.innerHTML = html;
+            } catch {
+                err.style.display = 'block';
+                output.textContent = t;
+                countEl.textContent = '0';
+            }
+        }
+
+        patternEl.addEventListener('input', testRegex);
+        textEl.addEventListener('input', testRegex);
+        testRegex();
+    </script>
+</body>
+</html>
